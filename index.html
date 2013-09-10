@@ -9,15 +9,10 @@
 
 <body>
 
-    <script type="text/template" id="movieListItem">
-        <h5><%= movie.get('title')%></h5>
-    </script>
     <script type="text/template" id="movieListTemplate">
-        <% _.each(movies, function(movie) { %>
-          <tr>
-            <td><%= htmlEncode(movie.get('title')) %></td>
-        </tr>
-        <% }); %>
+        <% _.each(movies, function(movie) { %>           
+            <h5><%= movie.attributes.title %></h5>
+            <% }); %>
     </script>
 
     <div class="navbar navbar-inverse navbar-fixed-top">

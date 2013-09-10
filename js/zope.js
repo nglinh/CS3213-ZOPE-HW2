@@ -22,7 +22,7 @@ Backbone.emulateHTTP = true; // Use _method parameter rather than using DELETE a
 Backbone.emulateJSON = true; // Send data to server via parameter rather than via request content
 var Movie = Backbone.Model.extend({
     initialize: function() {
-        this.on('all', function(e) { console.log(this.get('title') + " event: " + e); });
+        //this.on('all', function(e) { console.log(this.get('title') + " event for single movie: " + e); });
     },
     defaults: {
         id: 'NA',
@@ -38,7 +38,7 @@ var Movie = Backbone.Model.extend({
     urlRoot: "http://cs3213.herokuapp.com/movies/",
     url: function() {
         var base = this.urlRoot || (this.collection && this.collection.url) || "/";
-        return base + "/" + encodeURIComponent(this.id) + ".json";
+        return base + "/" + (this.id) + ".json";
     }
 });
 
@@ -55,10 +55,10 @@ var Movie = Backbone.Model.extend({
 
 var MovieList = Backbone.Collection.extend({
     initialize: function() {
-        this.on('all', function(e) { console.log("Movie event: " + e); });
+        //this.on('all', function(e) { console.log(e); });
     },
     model: Movie,
-    url: "http://cs3213.herokuapp.com/movies"
+    url: "http://cs3213.herokuapp.com/movies.json"
 });    
 
 var AppRouter = Backbone.Router.extend({
@@ -70,32 +70,36 @@ var AppRouter = Backbone.Router.extend({
     }
 });
 
-var MovieModel = Backbone.Model.extend({
-    initialize: function() {
-    }
-})
-
-var MovieItemView = Backbone.View.extend({
-    initialize: function() {
-        this.render();
-    },
-    render: function() {
-        var template = _.template( $("#movieListItem").html(), {movie: this.model} );
-        this.$el.html(template);
-    }
-})
+// var MovieItemView = Backbone.View.extend({
+//     initialize: function() {
+//         this.render();
+//     },
+//     render: function() {
+//         var template = _.template( $("#movieListItem").html(), {movie: this.model} );
+//         this.$el.html(template);
+//     }
+// })
 
 var MovieListView = Backbone.View.extend({
     initialize: function() {
+
         this.render();
     },
     render: function() {
-        var movieListModel = new MovieList();
-        movieListModel.fetch({
-            success: function (movieListModel){
-                var template = _.template($("#movieListTemplate").html(), {movies: movieListModel.models});
-            }
-        });
+       var self = this;
+       var movieListModel = new MovieList();
+       movieListModel.fetch({
+        success: function (movieListModel){
+            console.log(movieListModel);
+            var template = _.template($("#movieListTemplate").html(), {movies: movieListModel.models});
+            self.$el.html(template);
+        },
+        error: function(model, xhr, options){
+            console.log(model);
+            console.log(xhr);
+            console.log(options);
+        }
+    });
         // Compile the template using underscore
     }});
 
@@ -105,7 +109,6 @@ var MovieListView = Backbone.View.extend({
 
     app_router.on('route:defaultRoute', function(actions) {
         var movieListView = new MovieListView({ el: $("#list_container") });
-        movieListView.render();
     });
     app_router.on('route:viewMovieDetails', function(id) {
 
