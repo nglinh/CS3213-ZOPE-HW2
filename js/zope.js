@@ -33,12 +33,6 @@ var MovieModel = Backbone.Model.extend({
     }
 })
 
-
-var movies = [];
-movies.push(new MovieModel({title: "Hey there"}));
-movies.push(new MovieModel({title: "Hello"}));
-movies.push(new MovieModel({title: "heyheyhey"}));
-
 var MovieItemView = Backbone.View.extend({
     initialize: function() {
         this.render();
@@ -58,7 +52,7 @@ var MovieListView = Backbone.View.extend({
         var template = _.template( $("#movieListTemplate").html(), {} );
             // Load the compiled HTML into the Backbone "el"
             this.$el.html( template );
-            for (var i=0;i<movies.length;i++){
+            for (var i = 0; i < movies.length; i++){
                 console.log(movies[i]);
                 var movieItemView = new MovieItemView({model:movies[i]});
                 this.$el.append(movieItemView.el);
@@ -88,4 +82,51 @@ var MovieListView = Backbone.View.extend({
     Backbone.history.start();
 
 
-    
+Backbone.emulateHTTP = true; // Use _method parameter rather than using DELETE and PUT methods
+Backbone.emulateJSON = true; // Send data to server via parameter rather than via request content
+
+var Movie = Backbone.Model.extend({
+    initialize: function() {
+        this.on('all', function(e) { console.log(this.get('title') + " event: " + e); });
+    },
+    defaults: {
+        id: 'NA',
+        summary: 'NA'
+        title: 'NA',
+        updated_at: 'NA',
+        img_url: 'NA',
+        user: {
+            id: 'NA',
+            username: 'NA',
+        }
+    },
+    urlRoot: "http://cs3213.herokuapp.com/movies/",
+    url: function() {
+        var base = this.urlRoot || (this.collection && this.collection.url) || "/";
+        return base + "/" + encodeURIComponent(this.id) + ".json";
+    }
+});
+
+// To be used in the furute development
+// var movie = new Movie({id:movie_id});
+// movie.fetch(); // fetch model from DB with id = 1
+
+// movie = new Movie({title:"Joe Zim", summary:'Good story'});
+// movie.save(); // create and save a new model on the server, also get id back and set it
+
+// movie = new movie({id:1, name:"Joe Zim", age:23});
+// movie.save(); // update the model on the server (it has an id set, therefore it is on the server already)
+// movie.destroy(): // delete the model from the server
+
+var MovieList = Backbone.Collection.extend({
+    initialize: function() {
+        this.on('all', function(e) { console.log("Movie event: " + e); });
+    },
+    model: movie,
+    url: "http://cs3213.herokuapp.com/movies"
+});    
+
+var movieList = new MovieList();
+movieList.fetch(); // Get all models for this collection
+//movieList.create({name:"Joe Zim", age:23}); // Create model, add to Collection and add to DB
+//movieList.create({id:6, name:"Chuck Norris", age:72}); // Update model: add to Collection, update DB
