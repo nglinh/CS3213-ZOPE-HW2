@@ -12,7 +12,13 @@
     <script type="text/template" id="movieListItem">
         <h5><%= movie.get('title')%></h5>
     </script>
-    <script type="text/template" id="movieListTemplate"></script>
+    <script type="text/template" id="movieListTemplate">
+        <% _.each(movies, function(movie) { %>
+          <tr>
+            <td><%= htmlEncode(movie.get('title')) %></td>
+        </tr>
+        <% }); %>
+    </script>
 
     <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="navbar-inner">

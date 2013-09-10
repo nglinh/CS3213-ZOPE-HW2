@@ -18,80 +18,15 @@
 
 //     loadTemplate(0);
 // };
-
-var AppRouter = Backbone.Router.extend({
-    routes: {
-        "": "defaultRoute",
-        "movie/:id": "viewMovieDetails",
-        "movie/new": "createNewMovie",
-        "user/profile": "viewUserProfile",
-    }
-});
-
-var MovieModel = Backbone.Model.extend({
-    initialize: function() {
-    }
-})
-
-var MovieItemView = Backbone.View.extend({
-    initialize: function() {
-        this.render();
-    },
-    render: function() {
-        var template = _.template( $("#movieListItem").html(), {movie: this.model} );
-        this.$el.html(template);
-    }
-})
-
-var MovieListView = Backbone.View.extend({
-    initialize: function() {
-        this.render();
-    },
-    render: function() {
-        // Compile the template using underscore
-        var template = _.template( $("#movieListTemplate").html(), {} );
-            // Load the compiled HTML into the Backbone "el"
-            this.$el.html( template );
-            for (var i = 0; i < movies.length; i++){
-                console.log(movies[i]);
-                var movieItemView = new MovieItemView({model:movies[i]});
-                this.$el.append(movieItemView.el);
-            }
-        }
-    });
-
-
-    // Initiate the router
-    var app_router = new AppRouter;
-
-    app_router.on('route:defaultRoute', function(actions) {
-        var movieListView = new MovieListView({ el: $("#list_container") });
-        movieListView.render();
-    });
-    app_router.on('route:viewMovieDetails', function(id) {
-
-    });
-    app_router.on('route:createNewMovie', function() {
-
-    });
-    app_router.on('route:viewUserProfile', function() {
-
-    });
-
-    // Start Backbone history a necessary step for bookmarkable URL's
-    Backbone.history.start();
-
-
 Backbone.emulateHTTP = true; // Use _method parameter rather than using DELETE and PUT methods
 Backbone.emulateJSON = true; // Send data to server via parameter rather than via request content
-
 var Movie = Backbone.Model.extend({
     initialize: function() {
         this.on('all', function(e) { console.log(this.get('title') + " event: " + e); });
     },
     defaults: {
         id: 'NA',
-        summary: 'NA'
+        summary: 'NA',
         title: 'NA',
         updated_at: 'NA',
         img_url: 'NA',
@@ -122,11 +57,68 @@ var MovieList = Backbone.Collection.extend({
     initialize: function() {
         this.on('all', function(e) { console.log("Movie event: " + e); });
     },
-    model: movie,
+    model: Movie,
     url: "http://cs3213.herokuapp.com/movies"
 });    
 
-var movieList = new MovieList();
-movieList.fetch(); // Get all models for this collection
-//movieList.create({name:"Joe Zim", age:23}); // Create model, add to Collection and add to DB
-//movieList.create({id:6, name:"Chuck Norris", age:72}); // Update model: add to Collection, update DB
+var AppRouter = Backbone.Router.extend({
+    routes: {
+        "": "defaultRoute",
+        "movie/:id": "viewMovieDetails",
+        "movie/new": "createNewMovie",
+        "user/profile": "viewUserProfile",
+    }
+});
+
+var MovieModel = Backbone.Model.extend({
+    initialize: function() {
+    }
+})
+
+var MovieItemView = Backbone.View.extend({
+    initialize: function() {
+        this.render();
+    },
+    render: function() {
+        var template = _.template( $("#movieListItem").html(), {movie: this.model} );
+        this.$el.html(template);
+    }
+})
+
+var MovieListView = Backbone.View.extend({
+    initialize: function() {
+        this.render();
+    },
+    render: function() {
+        var movieListModel = new MovieList();
+        movieListModel.fetch({
+            success: function (movieListModel){
+                var template = _.template($("#movieListTemplate").html(), {movies: movieListModel.models});
+            }
+        });
+        // Compile the template using underscore
+    }});
+
+
+    // Initiate the router
+    var app_router = new AppRouter;
+
+    app_router.on('route:defaultRoute', function(actions) {
+        var movieListView = new MovieListView({ el: $("#list_container") });
+        movieListView.render();
+    });
+    app_router.on('route:viewMovieDetails', function(id) {
+
+    });
+    app_router.on('route:createNewMovie', function() {
+
+    });
+    app_router.on('route:viewUserProfile', function() {
+
+    });
+
+    // Start Backbone history a necessary step for bookmarkable URL's
+    Backbone.history.start();
+
+
+
