@@ -10,6 +10,10 @@ APP_SECRET = 'fd9338dab2c23e99bde73b649458a11a'
 CALL_BACK_URL = "http://frozen-lowlands-3487.herokuapp.com/callback"
 
 def index
+
+end
+
+def login
 	redirect_to "#{PROVIDER}/oauth/new?client_id=#{APP_ID}&redirect_uri=#{CALL_BACK_URL}"
 end
 
