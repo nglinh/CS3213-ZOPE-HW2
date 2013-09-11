@@ -26,7 +26,8 @@ var Movie = Backbone.Model.extend({
     },
     defaults: {
         id: 'NA',
-        summary: 'NA',
+        avg_score: 0,
+        summary: '',
         title: 'NA',
         updated_at: 'NA',
         img_url: 'NA',
@@ -123,5 +124,18 @@ var MovieListView = Backbone.View.extend({
     // Start Backbone history a necessary step for bookmarkable URL's
     Backbone.history.start();
 
+function regulate_length(long_string, max_length){
+
+    if (long_string.length > max_length - 3){
+        long_string = long_string.substring(0, max_length - 3) + '...';
+    }
+
+    return long_string;
+}
+
+function regulate_decimal_points(number, decimal_points){
+    var zeros = decimal_points * 10;
+    return parseFloat(Math.round(number * zeros) / zeros).toFixed(decimal_points);
+}
 
 
