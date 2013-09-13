@@ -1,3 +1,19 @@
+$.fn.serializeObject = function() {
+  var o = {};
+  var a = this.serializeArray();
+  $.each(a, function() {
+      if (o[this.name] !== undefined) {
+          if (!o[this.name].push) {
+              o[this.name] = [o[this.name]];
+          }
+          o[this.name].push(this.value || '');
+      } else {
+          o[this.name] = this.value || '';
+      }
+  });
+    return o;
+};
+
 // var loadTemplates = function (names, callback) {
 
 //     var that = this;
@@ -64,9 +80,14 @@ var Review = Backbone.Model.extend({
 
 var Reviews = Backbone.Collection.extend({
     initialize: function(options) {
-    this.id = options.id;
-  },
+        this.id = options.id;
+    },
     model: Review,
+    comparator: function(review){
+        var date = new Date(review.get("updated_at"));
+        return -date.getTime();
+
+    },
     urlRoot: "http://cs3213.herokuapp.com/movies/",
     url: function() {
         var base = this.urlRoot || (this.collection && this.collection.url) || "/";
@@ -92,7 +113,7 @@ var MovieList = Backbone.Collection.extend({
     },
     model: Movie,
     url: "http://cs3213.herokuapp.com/movies.json"
-});    
+});   
 
 var AppRouter = Backbone.Router.extend({
     routes: {
@@ -135,51 +156,59 @@ var MovieListView = Backbone.View.extend({
     });
         // Compile the template using underscore
     }});
+var movie = new Movie();
+var reviews;
 
-
-var MovieDetails = Backbone.View.extend({
-    el:'.movie_info_container',
-    render: function (id){
-        var self = this;
-        movie = new Movie({id:id});
-        movie.fetch({
-            success: function(movie) {
-                var template = _.template( $("#movie_info_template").html(), {movie: movie} );
-                self.$el.html(template);
-                console.log(movie.toJSON());
-            }
+var MoviePage = Backbone.View.extend({
+    render: function (){
+        var template = _.template( $("#movie_info_template").html(), {movie: movie} );
+        $("#list_container").html(template);
+        var review_template = _.template($("#review_template").html(), {reviews: reviews.models});
+        $("#list_container").append(review_template);
+        var write_review_template = _.template( $("#write_review_template").html(), {id:movie.get("id")} );
+        $("#list_container").append(write_review_template);
+    },
+    events: {
+        'submit .new-review-form' : 'saveReview'
+    },
+    saveReview: function(ev) {
+        var reviewDetail = $(ev.currentTarget).serializeObject();
+        var newReview = new Review();
+        console.log(reviewDetail);
+        newReview.save(reviewDetail, {
+            success: function (reviewDetail) {
+                router.navigate('', {trigger:true});
+                reviews.add(newReview);
+                this.render();
+          }
         });
+        return false;
     }
 });
 
-var ReviewList = Backbone.View.extend({
-    el:'.reviews_container',
-    render : function(id) {
-        var self = this;
-        reviews = new Reviews({id:id});
-        reviews.fetch({
-            success: function(reviews) {
-                console.log(reviews.toJSON());
-                var review_template = _.template($("#review_template").html(), {reviews: reviews.models});
-                self.$el.html(review_template);
-            }
-        });
-    }
-});
 
 
     // Initiate the router
-    var app_router = new AppRouter;
+    var app_router = new AppRouter();
 
     app_router.on('route:defaultRoute', function(actions) {
         var movieListView = new MovieListView({ el: $("#list_container") });
     });
     app_router.on('route:viewMovieDetails', function(id) {
-        var movieDetails = new MovieDetails();
-        movieDetails.render(id);
-        var reviewList = new ReviewList();
-        reviewList.render(id);
-
+        var moviePage = new MoviePage({ el: $("#list_container") });
+        movie.set({id:id});
+        movie.fetch({
+            success: function(movie) {
+                //console.log(movie.toJSON());
+                reviews = new Reviews({id:id});
+                reviews.fetch({
+                    success: function(reviews) {
+                        //console.log(reviews.toJSON());
+                        moviePage.render();
+                    }
+                });
+            }
+        });
     });
     app_router.on('route:createNewMovie', function() {
 
@@ -204,5 +233,6 @@ function regulate_decimal_points(number, decimal_points){
     var zeros = decimal_points * 10;
     return parseFloat(Math.round(number * zeros) / zeros).toFixed(decimal_points);
 }
+
 
 
