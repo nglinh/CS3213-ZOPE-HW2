@@ -21,7 +21,7 @@ def callback
 	token = params[:code]
 	url = "#{PROVIDER}/oauth/token.json?client_id=#{APP_ID}&client_secret=#{APP_SECRET}&code=#{token}"
 	
-	respond = http_request(url)
+	@respond = http_request(url)
 	
 	access_token = parse_token(respond.body)
 	session[:access_token] = access_token
