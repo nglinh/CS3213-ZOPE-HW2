@@ -72,34 +72,44 @@
  
 <script type="text/template" id="review_template">
 <div class="container">
-  <div class="well">
-    <% _.each(reviews, function(review) { %>           
+    <% _.each(reviews, function(review) { %>
+    <div class="well">           
       <div class="row-fluid">
         <p class="span12">
         <strong><%= review.attributes.user.username %></strong> (<% print(moment(review.attributes.updated_at).fromNow()) %>).
         </p>
-      </div>
       <span class="badge badge-info pull-right">
-        <%= review.attributes.score %> 
+        <%= review.attributes.score %> points
       </span>
+      </div>
       <div class="row-fluid">
-        <p class="span9"><%= review.attributes.comment %></p> 
+        <p class="span9"><%= review.attributes.comment %></p>
+    </div> 
       </div>
     <% }); %>
-  </div>
 </div>
 </script>
 <script type="text/template" id="write_review_template">
-<form class="new-review-form">
+<form class="new-review-form form-horizontal">
+<div class="well container">
   <input name="id" type="hidden" value="<%= id %>">
-  <div class="row-fluid">
-    <label class="span3" for="review_score">Score (1-100)</label>
-    <input class="span3" id="review_score" name="score" type="number" min="1" max="100" value="">
+  <div class="control-group">
+    <label class="control-label" for="review_score">Score (1-100)</label>
+    <div class="controls">
+      <input id="review_score" name="score" type="number" min="1" max="100" value="">
+    </div>
   </div>
-  <div class="row-fluid">
-    <label class="span3" for="review_comment">Comment</label>
-    <textarea class="span9" cols="40" id="review_comment" name="comment" rows="3"value=""></textarea>
+  <div class="control-group">
+    <label class="control-label" for="review_comment">Comment</label>
+    <div class="controls">
+      <textarea class="span9" cols="40" id="review_comment" name="comment" rows="3"value=""></textarea>
+    </div>
   </div>
-  <input type="submit" value="Create Review">
+  <div class="control-group">
+  <div class="controls">
+    <input class="btn" type="submit" value="Create Review">
+  </div>
+  </div>
+  </div>
 </form>
 </script>

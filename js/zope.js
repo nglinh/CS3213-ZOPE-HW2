@@ -156,6 +156,7 @@ var MovieListView = Backbone.View.extend({
     });
         // Compile the template using underscore
     }});
+
 var movie = new Movie();
 var reviews;
 
@@ -180,7 +181,10 @@ var MoviePage = Backbone.View.extend({
                 router.navigate('', {trigger:true});
                 reviews.add(newReview);
                 this.render();
-          }
+            },
+            error: function (){
+                alert("You are not allowed to write a review");
+            }
         });
         return false;
     }
