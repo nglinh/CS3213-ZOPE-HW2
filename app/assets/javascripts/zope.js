@@ -116,7 +116,6 @@ var AppRouter = Backbone.Router.extend({
         "": "defaultRoute",
         "movie/:id": "viewMovieDetails",
         "new": "createNewMovie",
-        "user/profile": "viewUserProfile",
     }
 });
 
@@ -346,9 +345,6 @@ app_router.on('route:createNewMovie', function() {
     NProgress.start();
     var movieCreationView = new MovieCreationView({ el: $("#list_container") });
     movieCreationView.render();
-});
-app_router.on('route:viewUserProfile', function() {
-
 });
 
 // Start Backbone history a necessary step for bookmarkable URL's
