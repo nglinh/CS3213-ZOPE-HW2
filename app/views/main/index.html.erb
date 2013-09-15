@@ -121,18 +121,18 @@
         <img class="img-rounded" src="<%%= movie.get('img_url') %>">
       </div>
       <h3 class="muted text-cente"><%%= regulate_length(movie.attributes.title, 24) %></h3>
+    <div>
+      <button class="delete-movie btn btn-danger" value=>Delete</button>
+    </div>
     </div>
     <h5>Description</h5>
     <p class="description"><%%= movie.get('summary') %></p>
-    <div>
-      <button class="btn btn-danger" value=>Delete</button>
-    </div>
+
   </div>
 </script>
 
 <script type="text/template" id="review_template">
-  <div class="container">
-    <%% _.each(reviews, function(review) { %>
+  <div class="container<%%= review.attributes.id %>">
       <div class="well">           
         <div class="row-fluid">
           <p class="span12">
@@ -146,12 +146,11 @@
           <p class="span9"><%%= review.attributes.comment %></p>
         </div> 
         <div>
-          <%% if(true) {%>
+          <%% if(login_user.id == review.attributes.user.id) {%>
             <button class="delete-review btn btn-danger" value="Delete Review">Delete Review</button>
             <%%}%>
           </div>
         </div>
-        <%% }); %>
   </div>
 </script>
 <script type="text/template" id="write_review_template">

@@ -52,8 +52,8 @@ $(document).on('click', 'a', function(event) {
 
 //     loadTemplate(0);
 // };
-Backbone.emulateHTTP = true; // Use _method parameter rather than using DELETE and PUT methods
-Backbone.emulateJSON = true; // Send data to server via parameter rather than via request content
+// Backbone.emulateHTTP = true; // Use _method parameter rather than using DELETE and PUT methods
+// Backbone.emulateJSON = true; // Send data to server via parameter rather than via request content
 var Movie = Backbone.Model.extend({
     initialize: function() {
         //this.on('all', function(e) { console.log(this.get('title') + " event for single movie: " + e); });
@@ -73,13 +73,12 @@ var Movie = Backbone.Model.extend({
     urlRoot: "http://cs3213.herokuapp.com/movies/",
     url: function() {
         var base = this.urlRoot || (this.collection && this.collection.url) || "/";
-        return base + "/" + (this.id) + ".json";
+        return base + (this.id) + ".json";
     }
 });
 
 var Review = Backbone.Model.extend({
     defaults: {
-        id: 'NA',
         movie_id: 'NA',
         comment: 'NA',
         score: 'NA',
@@ -91,8 +90,8 @@ var Review = Backbone.Model.extend({
     },
     urlRoot: "http://cs3213.herokuapp.com/movies/",
     url: function() {
-        var base = this.urlRoot || (this.collection && this.collection.url) || "/";
-        return base  + (this.movie_id) + ".json/reviews.json";
+        var base = this.urlRoot;
+        return base  + (this.get("movie_id")) + "/reviews.json";
     },
 });
 
@@ -213,22 +212,28 @@ var MovieListView = Backbone.View.extend({
 
 var movie = new Movie();
 var reviews;
+var moviePage;
 
 var MoviePage = Backbone.View.extend({
-    render: function (){
+    render: function (choice){
         NProgress.start();
+        switch(choice) {
+        case 1:
         var template = _.template( $("#movie_info_template").html(), {movie: movie} );
         $("#list_container").html(template);
-        var review_template = _.template($("#review_template").html(), {reviews: reviews.models});
-        $("#list_container").append(review_template);
+        break;
+        case 2:
         var write_review_template = _.template( $("#write_review_template").html(), {id:movie.get("id")} );
         $("#list_container").append(write_review_template);
+        break;
+    }
         NProgress.done();
     },
     events: {
 
         'submit .new-review-form' : 'saveReview',
-        'click btn': 'deleteMovie'
+        'click .delete-movie': 'deleteMovie',
+
     },
     saveReview: function(ev) {
         NProgress.start();
@@ -236,16 +241,21 @@ var MoviePage = Backbone.View.extend({
         reviewDetail.access_token = getAccessToken();
         reviewDetail.user = getUser();
         var newReview = new Review();
+        var self = this;
         console.log(reviewDetail);
         newReview.save(reviewDetail, {
-            success: function (reviewDetail) {
-                router.navigate('', {trigger:true});
+            success: function () {
                 reviews.add(newReview);
-                this.render();
+                console.log(reviews);
+                $("#list_container").html();
+                self.render(1);
+                renderReviews(reviews);
+                self.render(2);
                 NProgress.done();
             },
             error: function (){
                 alert("You are not allowed to write a review");
+                console.log(newReview);
                 NProgress.done();
             }
         });
@@ -253,12 +263,19 @@ var MoviePage = Backbone.View.extend({
 
     },
     deleteMovie: function(ev) {
-        NProgress.start();
-        movie.delete({
-            success: function(){
-                NProgress.done();
+
+        console.log(movie);
+        movie.destroy({
+            data : {
+                access_token: getAccessToken()
             },
-            error: function(){
+            processData: true,
+            success: function(model,response){
+                alert("deleted");
+                NProgress.done();
+                app_router.navigate("", {trigger: true});
+            },
+            error: function(model,response){
                 alert("This movie cannot be deleted");
                 NProgress.done();
             }
@@ -266,6 +283,21 @@ var MoviePage = Backbone.View.extend({
     }
 });
 
+var ReviewView = Backbone.View.extend ({
+    initialize: function(option) {
+        this.model = option.review;
+    },
+    render: function() {
+        var review_template = _.template($("#review_template").html(), {review: this.model, login_user:getUser()});
+        $("#list_container").append(review_template);
+    },
+    events: {
+        'click .delete-review' : 'deleteReview'
+    },
+    deleteReview: function () {
+        alert(model.get("id"));
+    }
+});
 
 
     // Initiate the router
@@ -275,7 +307,9 @@ var MoviePage = Backbone.View.extend({
         var movieListView = new MovieListView({ el: $("#list_container") });
     });
     app_router.on('route:viewMovieDetails', function(id) {
-        var moviePage = new MoviePage({ el: $("#list_container") });
+        if (typeof moviePage == 'undefined') {
+            moviePage = new MoviePage({ el: $("#list_container") });
+        }    
         movie.set({id:id});
         movie.fetch({
             success: function(movie) {
@@ -284,11 +318,14 @@ var MoviePage = Backbone.View.extend({
                 reviews.fetch({
                     success: function(reviews) {
                         //console.log(reviews.toJSON());
-                        moviePage.render();
+                        moviePage.render(1);
+                        renderReviews(reviews);
+                        moviePage.render(2);
                     }
                 });
             }
         });
+
     });
     app_router.on('route:createNewMovie', function() {
         var movieCreationView = new MovieCreationView({ el: $("#list_container") });
@@ -311,21 +348,34 @@ function regulate_length(long_string, max_length){
     return long_string;
 }
 
-    function regulate_decimal_points(number){
-        var decimal_points = 2;
-        var zeros = decimal_points * 10;
-        return parseFloat(Math.round(number * zeros) / zeros).toFixed(decimal_points);
-    }
+function regulate_decimal_points(number){
+    var decimal_points = 2;
+    var zeros = decimal_points * 10;
+    return parseFloat(Math.round(number * zeros) / zeros).toFixed(decimal_points);
+}
 
 
-    function getAccessToken() {
-        return window.access_token;
-    }
+function getAccessToken() {
+    return window.access_token;
+}
 
-    function getUser() {
-        return {
-            id: window.user_id,
-            email: window.user_email
-        };
+function getUser() {
+    return {
+        id: window.user_id,
+        username: window.user_email
+    };
+}
+function deleteReview() {
+    alert("delete");
+}
+
+function renderReviews(reviews) {
+    for (var i =0;i< reviews.length;i++) {
+        var review = reviews.at(i);
+        console.log("Review is: " );
+        console.log(review);
+        var reviewView = new ReviewView({el:$(".container"+review.get("id")), review:review});
+        reviewView.render();
     }
+}
 
