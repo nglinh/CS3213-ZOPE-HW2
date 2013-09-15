@@ -174,6 +174,7 @@ var MoviePage = Backbone.View.extend({
     },
     saveReview: function(ev) {
         var reviewDetail = $(ev.currentTarget).serializeObject();
+        reviewDetail["data"]["access_token"] = "177b2714bdf3bde52f866f5f36aaddc1"; 
         var newReview = new Review();
         console.log(reviewDetail);
         newReview.save(reviewDetail, {

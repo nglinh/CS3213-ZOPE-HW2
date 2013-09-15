@@ -1,3 +1,19 @@
+$.fn.serializeObject = function() {
+  var o = {};
+  var a = this.serializeArray();
+  $.each(a, function() {
+      if (o[this.name] !== undefined) {
+          if (!o[this.name].push) {
+              o[this.name] = [o[this.name]];
+          }
+          o[this.name].push(this.value || '');
+      } else {
+          o[this.name] = this.value || '';
+      }
+  });
+    return o;
+};
+
 // var loadTemplates = function (names, callback) {
 
 //     var that = this;
@@ -43,6 +59,43 @@ var Movie = Backbone.Model.extend({
     }
 });
 
+var Review = Backbone.Model.extend({
+    defaults: {
+        id: 'NA',
+        movie_id: 'NA',
+        comment: 'NA',
+        score: 'NA',
+        updated_at: 'NA',
+        user: {
+            id: 'NA',
+            username: 'NA',
+        }
+    },
+    urlRoot: "http://cs3213.herokuapp.com/movies/",
+    url: function() {
+        var base = this.urlRoot || (this.collection && this.collection.url) || "/";
+        return base  + (this.id) + ".json/reviews.json";
+    },
+});
+
+var Reviews = Backbone.Collection.extend({
+    initialize: function(options) {
+        this.id = options.id;
+    },
+    model: Review,
+    comparator: function(review){
+        var date = new Date(review.get("updated_at"));
+        return -date.getTime();
+
+    },
+    urlRoot: "http://cs3213.herokuapp.com/movies/",
+    url: function() {
+        var base = this.urlRoot || (this.collection && this.collection.url) || "/";
+        return base  + (this.id) + "/reviews.json";
+    }
+    
+});
+
 // To be used in the furute development
 // var movie = new Movie({id:movie_id});
 // movie.fetch(); // fetch model from DB with id = 1
@@ -60,7 +113,7 @@ var MovieList = Backbone.Collection.extend({
     },
     model: Movie,
     url: "http://cs3213.herokuapp.com/movies.json"
-});    
+});   
 
 var AppRouter = Backbone.Router.extend({
     routes: {
@@ -111,15 +164,75 @@ var MovieListView = Backbone.View.extend({
         // Compile the template using underscore
     }});
 
+var movie = new Movie();
+var reviews;
+
+var MoviePage = Backbone.View.extend({
+    render: function (){
+        var template = _.template( $("#movie_info_template").html(), {movie: movie} );
+        $("#list_container").html(template);
+        var review_template = _.template($("#review_template").html(), {reviews: reviews.models});
+        $("#list_container").append(review_template);
+        var write_review_template = _.template( $("#write_review_template").html(), {id:movie.get("id")} );
+        $("#list_container").append(write_review_template);
+    },
+    events: {
+        'submit .new-review-form' : 'saveReview',
+        'click btn': 'deleteMovie'
+    },
+    saveReview: function(ev) {
+        var reviewDetail = $(ev.currentTarget).serializeObject();
+        reviewDetail.access_token = getAccessToken();
+        reviewDetail.user = getUser();
+        var newReview = new Review();
+        console.log(reviewDetail);
+        newReview.save(reviewDetail, {
+            success: function (reviewDetail) {
+                router.navigate('', {trigger:true});
+                reviews.add(newReview);
+                this.render();
+            },
+            error: function (){
+                alert("You are not allowed to write a review");
+            }
+        });
+        return false;
+    },
+    deleteMovie: function(ev) {
+        movie.delete({
+            success: function(){
+
+            },
+            error: function(){
+                alert("This movie cannot be deleted");
+            }
+        });
+    }
+});
+
+
 
     // Initiate the router
-    var app_router = new AppRouter;
+    var app_router = new AppRouter();
 
     app_router.on('route:defaultRoute', function(actions) {
         var movieListView = new MovieListView({ el: $("#list_container") });
     });
     app_router.on('route:viewMovieDetails', function(id) {
-
+        var moviePage = new MoviePage({ el: $("#list_container") });
+        movie.set({id:id});
+        movie.fetch({
+            success: function(movie) {
+                //console.log(movie.toJSON());
+                reviews = new Reviews({id:id});
+                reviews.fetch({
+                    success: function(reviews) {
+                        //console.log(reviews.toJSON());
+                        moviePage.render();
+                    }
+                });
+            }
+        });
     });
     app_router.on('route:createNewMovie', function() {
         var movieCreation = new MovieCreation({ el: $("#list_container") });
@@ -146,4 +259,14 @@ function regulate_decimal_points(number, decimal_points){
     return parseFloat(Math.round(number * zeros) / zeros).toFixed(decimal_points);
 }
 
+function getAccessToken() {
+    return window.access_token;
+}
+
+function getUser() {
+    return {
+        id: window.user_id,
+        email: window.user_email
+    };
+}
 
