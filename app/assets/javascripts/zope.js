@@ -54,8 +54,6 @@ window.onbeforeunload = function(evt) {
     }
 }
 
-Backbone.emulateHTTP = true; // Use _method parameter rather than using DELETE and PUT methods
-Backbone.emulateJSON = true; // Send data to server via parameter rather than via request content
 var Movie = Backbone.Model.extend({
     initialize: function() {
         //this.on('all', function(e) { console.log(this.get('title') + " event for single movie: " + e); });
@@ -160,11 +158,11 @@ var MovieCreationView = Backbone.View.extend({
             method: 'POST',
             error: function(e){
                 console.log(e);
-                console.log("ajax call to create movie failed");
+                alert("Create movie failed");
             },
             success: function(e){
                 console.log(e);
-                console.log("ajax call to create movie succeeded");
+                alert("Create movie succeeded");
             },
             beforeSubmit: function(e){
 
@@ -227,7 +225,7 @@ var MovieEditView = Backbone.View.extend({
             },
             success: function(e){
                 alert("Edit movie succeeded");
-                app_router.navigate('/', {target: true});
+                app_router.navigate("", {trigger: true});
             },
             beforeSubmit: function(e){
 
