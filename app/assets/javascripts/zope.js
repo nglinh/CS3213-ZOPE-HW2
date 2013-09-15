@@ -4,6 +4,17 @@ $(document).ready(function () {
     NProgress.done();
 });
 
+function add_file_button(){
+    var change_img_button = $('.movie-img');
+    if ($('.movie-img').html() === 'Change Img'){
+        change_img_button.html('Remove Image Upload');
+        $('.movie-file-holder').html('<input id="movie_img" name="movie[img]" type="file" required="true">');
+    } else{
+        change_img_button.html('Change Img');
+        $('.movie-file-holder').html('');
+    }
+}
+
 $.fn.serializeObject = function() {
   var o = {};
   var a = this.serializeArray();
@@ -126,6 +137,7 @@ var AppRouter = Backbone.Router.extend({
     routes: {
         "": "defaultRoute",
         "movie/:id": "viewMovieDetails",
+        "movie/:id/edit": "editMovieDetails",        
         "new": "createNewMovie",
         "user/profile": "viewUserProfile",
     }
@@ -139,7 +151,6 @@ var MovieCreationView = Backbone.View.extend({
     events: {
         'submit .new_movie' : 'submitNewMovie',
     },
-
     submitNewMovie: function(e){
         var access_token = getAccessToken();
         
@@ -185,6 +196,56 @@ var MovieCreationModel = Backbone.Model.extend({
     },
 });
 
+var MovieEditView = Backbone.View.extend({
+    render : function(id) {
+        var movie = new Movie();
+        var that = this;
+        movie.id = id;
+        console.log("id is: " + id);
+        movie.fetch({
+            success: function(e){
+                console.log('successfully retrieved the movie');
+                var template = _.template( $("#movie_edit").html(), {movie: movie} );
+                that.$el.html(template);
+            },
+            error: function(e){
+                console.log('failed to retrieve movie');
+            }
+        });
+    },
+    events: {
+        'submit .edit_movie' : 'submitEditMovie',
+    },
+    submitEditMovie: function(e){
+        var access_token = getAccessToken();
+        
+        if (access_token === ""){
+            alert("Please Login");
+            return false;
+        }
+        var id = (e.currentTarget)[1].value;
+        $(e.target).closest('form').ajaxSubmit({
+            url: 'http://cs3213.herokuapp.com/movies/' + id + '.json',
+            dataType: 'application/json',
+            data: {
+                access_token: access_token
+            },
+            method: 'PUT',
+            error: function(e){
+                alert("Edit movie failed");
+            },
+            success: function(e){
+                alert("Edit movie succeeded");
+                app_router.navigate('/', {target: true});
+            },
+            beforeSubmit: function(e){
+
+            }
+        });
+        return false;
+    }
+});
+
 var MovieListView = Backbone.View.extend({
     initialize: function() {
 
@@ -226,7 +287,6 @@ var MoviePage = Backbone.View.extend({
         NProgress.done();
     },
     events: {
-
         'submit .new-review-form' : 'saveReview',
         'click btn': 'deleteMovie'
     },
@@ -289,6 +349,10 @@ var MoviePage = Backbone.View.extend({
                 });
             }
         });
+    });
+    app_router.on('route:editMovieDetails', function(id){
+        var movieEditView = new MovieEditView({ el: $("#list_container") });
+        movieEditView.render(id);
     });
     app_router.on('route:createNewMovie', function() {
         var movieCreationView = new MovieCreationView({ el: $("#list_container") });
