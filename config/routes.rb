@@ -5,6 +5,9 @@ Cs3213HW2::Application.routes.draw do
   get '/logout' => 'main#logout'
   get '/callback' => 'main#callback'
 
+  get 'movie/:id' => 'main#index'
+  get 'new/' => 'main#index'
+  
   root 'main#index'
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
