@@ -74,7 +74,7 @@ var Review = Backbone.Model.extend({
     urlRoot: "http://cs3213.herokuapp.com/movies/",
     url: function() {
         var base = this.urlRoot || (this.collection && this.collection.url) || "/";
-        return base  + (this.id) + ".json/reviews.json";
+        return base  + (this.movie_id) + ".json/reviews.json";
     },
 });
 
