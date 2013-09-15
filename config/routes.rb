@@ -8,6 +8,8 @@ Cs3213HW2::Application.routes.draw do
   get 'movie/:id' => 'main#index'
   get 'new/' => 'main#index'
   get 'movie/:id/edit' => 'main#index'
+  get 'page/:movie_page_id'=> 'main#index'
+
 
   root 'main#index'
   # The priority is based upon order of creation: first created -> highest priority.

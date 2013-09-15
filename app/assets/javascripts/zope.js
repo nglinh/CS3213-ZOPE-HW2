@@ -15,6 +15,36 @@ function add_file_button(){
     }
 }
 
+function activate_page_button(){
+
+    $('.previous-page-button').on({
+        click: previous_page
+    });
+    $('.next-page-button').on({
+        click: next_page
+    });
+
+    if (page_number <= 1){
+        $('.previous-page-button').css({"display":"none"});
+    }
+}
+
+function previous_page(){
+    console.log('Previous Page');
+    page_number -= 1;
+    switch_to_page(page_number);
+}
+
+function next_page(){
+    console.log('Next Page');
+    page_number += 1;
+    switch_to_page(page_number);
+}
+
+function switch_to_page(number){
+    app_router.navigate("page/" + number, {trigger: true});
+}
+
 $.fn.serializeObject = function() {
   var o = {};
   var a = this.serializeArray();
@@ -123,11 +153,11 @@ var MovieList = Backbone.Collection.extend({
 
 var AppRouter = Backbone.Router.extend({
     routes: {
+        "page/:movie_page_id": "movie_in_page",
         "": "defaultRoute",
         "movie/:id": "viewMovieDetails",
         "movie/:id/edit": "editMovieDetails",        
         "new": "createNewMovie",
-        "user/profile": "viewUserProfile",
     }
 });
 
@@ -163,6 +193,7 @@ var MovieCreationView = Backbone.View.extend({
             success: function(e){
                 console.log(e);
                 alert("Create movie succeeded");
+                app_router.navigate("/movie/" + e.id, {target:true});
             },
             beforeSubmit: function(e){
 
@@ -184,6 +215,8 @@ var MovieCreationModel = Backbone.Model.extend({
         return "http://cs3213.herokuapp.com/movies.json";
     },
 });
+
+var page_number = 1;
 
 var MovieEditView = Backbone.View.extend({
     render : function(id) {
@@ -241,14 +274,17 @@ var MovieListView = Backbone.View.extend({
         this.render();
     },
     render: function() {
+        console.log("this renders");
         var self = this;
         var movieListModel = new MovieList();
+        movieListModel.url = "http://cs3213.herokuapp.com/movies.json" + "?page=" + page_number;
 
         movieListModel.fetch({
             success: function (movieListModel){
                 var template = _.template($("#movieListTemplate").html(), {movies: movieListModel.models});
                 self.$el.html(template);
                 NProgress.done();
+                activate_page_button();
             },
             error: function(model, xhr, options){
                 console.log(model);
@@ -377,32 +413,33 @@ app_router.on('route:viewMovieDetails', function(id) {
                 });
             }
         });
-    });
-    app_router.on('route:editMovieDetails', function(id){
-        var movieEditView = new MovieEditView({ el: $("#list_container") });
-        movieEditView.render(id);
-    });
-    app_router.on('route:createNewMovie', function() {
-        var movieCreationView = new MovieCreationView({ el: $("#list_container") });
-        movieCreationView.render();
-    });
-    app_router.on('route:viewUserProfile', function() {
-    });
-    app_router.on('route:createNewMovie', function() {
-    NProgress.start();
-        var movieCreationView = new MovieCreationView({ el: $("#list_container") });
-        movieCreationView.render();
-    });
-    app_router.on('route:viewUserProfile', function() {
-
 });
+
+app_router.on('route:editMovieDetails', function(id){
+    var movieEditView = new MovieEditView({ el: $("#list_container") });
+    movieEditView.render(id);
+});
+
+app_router.on('route:createNewMovie', function() {
+    NProgress.start();
+    var movieCreationView = new MovieCreationView({ el: $("#list_container") });
+    movieCreationView.render();
+});
+
+app_router.on('route:movie_in_page', function(id) {
+    NProgress.start();
+    console.log('Going to page: ' + id);
+    page_number = parseInt(id);
+    var movieListView = new MovieListView({ el: $("#list_container") });
+});
+
 
 // Start Backbone history a necessary step for bookmarkable URL's
 Backbone.history.start({pushState: true,
     root: "/"});
 
 function regulate_length(long_string){
-    var max_length = 23;
+    var max_length = 22;
 
     if (long_string.length >= max_length - 3){
         long_string = long_string.substring(0, max_length - 4) + '...';
