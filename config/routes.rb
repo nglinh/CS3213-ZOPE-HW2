@@ -5,12 +5,13 @@ Cs3213HW2::Application.routes.draw do
   get '/logout' => 'main#logout'
   get '/callback' => 'main#callback'
 
-  get 'movie/:id' => 'main#index'
-  get 'new/' => 'main#index'
+  get '/movie/:id' => 'main#index'
+  get '/new/' => 'main#index'
 
 
-  get 'movie/:id/edit' => 'main#index'
-  get 'page/:movie_page_id'=> 'main#index'
+  get '/movie/:id/edit' => 'main#index'
+  get '/page/:movie_page_id'=> 'main#index'
+
 
 
   root 'main#index'
