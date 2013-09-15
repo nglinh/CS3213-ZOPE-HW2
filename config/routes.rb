@@ -3,6 +3,8 @@ Cs3213HW2::Application.routes.draw do
   get '/index' => 'main#index'
   get '/login' => 'main#login'
   get '/callback' => 'main#callback'
+
+  root 'main#index'
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 

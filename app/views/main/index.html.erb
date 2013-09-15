@@ -46,6 +46,8 @@
   <div id="list_container"></div>
   
   <%= session[:access_token]%>
+  <%= session[:current_user_email]%>
+  <%= session[:current_user_id] %>
    <%=javascript_include_tag "jquery-1.10.2.min"%>
    <%=javascript_include_tag "underscore-min"%>
    <%=javascript_include_tag "bootstrap.min"%>
