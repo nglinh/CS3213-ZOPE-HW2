@@ -1,46 +1,77 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Movie Gallery</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Bootstrap -->
+  <title>Movie Gallery</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Bootstrap -->
   
-    <%=stylesheet_link_tag "bootstrap.min.css"%>
+  <%=stylesheet_link_tag "bootstrap.min.css"%>
 </head>
 
 <body>
 
-    <script type="text/template" id="movieListTemplate">
+  <script type="text/template" id="movieListTemplate">
+  <div class='container'>
+  <div class='row'>
+  <%% _.each(movies, function(movie) { %> 
+    <div class="span3 movie"><h4 class="movie-title"><%%= regulate_length(movie.attributes.title, 24) %></h4>
+    <img src=<%%= movie.attributes.img_url %>>
+    <p>Score: <%%= regulate_decimal_points(movie.attributes.avg_score, 2) %></p>
+    </div>
+    <%% }); %>
+  </div>
+  </div>
+  </script>
+
+  <script type="text/template" id="movie_creation">
     <div class='container'>
-      <div class='row'>
-        <%% _.each(movies, function(movie) { %> 
-            <div class="span3 movie"><h4 class="movie-title"><%%= regulate_length(movie.attributes.title, 24) %></h4>
-            <img src=<%%= movie.attributes.img_url %>>
-            <p>Score: <%%= regulate_decimal_points(movie.attributes.avg_score, 2) %></p>
+      <div><h3>Create new movie</h3>
+
+        <form name="movie" method="POST">
+          <div class="control-group">
+            <label class="control-label" for="movie_title">Title</label>
+            <div class="controls">
+            <input class="text_field" id="movie_title" name="movie[title]" size="30" type="text" required="true">
             </div>
-        <%% }); %>
+            </div>
+            <div class="control-group">
+            <label class="control-label" for="movie_summary">Summary</label>
+            <div class="controls">
+            <input class="text_field" id="movie_summary" name="movie[summary]" size="30" type="text" required="true">
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label" for="movie_img">Img</label>
+            <div class="controls">
+            <input id="movie_img" name="movie[img]" type="file" required="true">
+            </div>
+          </div>
+
+          <a class="btn btn-primary" id="submit">Create Movie</a>
+          <a href="#" id="cancel" class="btn">Cancel</a>
+        </form>
       </div>
     </div>
   </script>
-   
 
-    <div class="navbar navbar-inverse navbar-fixed-top">
-        <div class="navbar-inner">
-            <div class="container">
-                <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="brand" href="#">Movie Gallery</a>
-                <div class="nav-collapse collapse">
-                    <ul class="nav">
-                      <li class="active"><a href="#">List All</a></li>
-                      <li><a href="/login">Sign in</a></li>
-                  </ul>
-              </div><!--/.nav-collapse -->
-          </div>
+  <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="brand" href="#">Movie Gallery</a>
+        <div class="nav-collapse collapse">
+          <ul class="nav">
+            <li class="active"><a href="#">List All</a></li>
+            <li><a href="/login">Sign in</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
       </div>
+    </div>
   </div>
   <div id="placeholder" style="height:45px"></div>
   <div id="list_container"></div>
@@ -48,11 +79,11 @@
   <%= session[:access_token]%>
   <%= session[:current_user_email]%>
   <%= session[:current_user_id] %>
-   <%=javascript_include_tag "jquery-1.10.2.min"%>
-   <%=javascript_include_tag "underscore-min"%>
-   <%=javascript_include_tag "bootstrap.min"%>
-   <%=javascript_include_tag "backbone-min"%>
-   <%=javascript_include_tag "zope"%>
+  <%=javascript_include_tag "jquery-1.10.2.min"%>
+  <%=javascript_include_tag "underscore-min"%>
+  <%=javascript_include_tag "bootstrap.min"%>
+  <%=javascript_include_tag "backbone-min"%>
+  <%=javascript_include_tag "zope"%>
 
 </body>
 </html>

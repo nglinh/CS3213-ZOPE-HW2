@@ -66,20 +66,18 @@ var AppRouter = Backbone.Router.extend({
     routes: {
         "": "defaultRoute",
         "movie/:id": "viewMovieDetails",
-        "movie/new": "createNewMovie",
+        "new": "createNewMovie",
         "user/profile": "viewUserProfile",
     }
 });
 
-// var MovieItemView = Backbone.View.extend({
-//     initialize: function() {
-//         this.render();
-//     },
-//     render: function() {
-//         var template = _.template( $("#movieListItem").html(), {movie: this.model} );
-//         this.$el.html(template);
-//     }
-// })
+var MovieCreation = Backbone.View.extend({
+    el: '.list_container',
+    render : function(id) {
+        var template = _.template( $("#movie_creation").html(), {} );
+        this.$el.html(template);
+    }
+});
 
 var MovieListView = Backbone.View.extend({
     initialize: function() {
@@ -115,7 +113,8 @@ var MovieListView = Backbone.View.extend({
 
     });
     app_router.on('route:createNewMovie', function() {
-
+        var movieCreation = new MovieCreation({ el: $("#list_container") });
+        movieCreation.render();
     });
     app_router.on('route:viewUserProfile', function() {
 
