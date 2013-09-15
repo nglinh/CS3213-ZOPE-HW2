@@ -13,11 +13,12 @@
     <div class='container'>
       <div class='row'>
         <% _.each(movies, function(movie) { %> 
-            <div class="span3 movie"><h4 class="movie-title"><%= regulate_length(movie.attributes.title, 24) %></h4>
+          <div class="span3 movie">
+            <h4 class="movie-title"><%= regulate_length(movie.attributes.title) %></h4>
             <img class= "img-rounded" src=<%= movie.attributes.img_url %>>
-            <p>Score: <%= regulate_decimal_points(movie.attributes.avg_score, 2) %></p>
-            </div>
-        <% }); %>
+            <p>Score: <%= regulate_decimal_points(movie.attributes.avg_score) %></p>
+          </div>
+          <% }); %>
       </div>
     </div>
   </script>
@@ -57,59 +58,69 @@
   
 </body>
 </html>
-  <script type="text/template" id="movie_info_template">
-    <div class = "container" style= "margin-bottom: 50px; margin-top: 20px;">
-      <div class="page-header">
+<script type="text/template" id="movie_info_template">
+  <div class = "container" style= "margin-bottom: 50px; margin-top: 20px;">
+    <div class="page-header">
       <div class="span4">
-      <img class="img-rounded" src="<%= movie.get('img_url') %>">
+        <img class="img-rounded" src="<%= movie.get('img_url') %>">
       </div>
-      <h3 class="muted text-cente"><%= regulate_length(movie.attributes.title, 24) %></h3>
-      </div>
-      <h5>Description</h5>
-      <p class="description"><%= movie.get('summary') %></p>
+      <h3 class="muted text-cente"><%= regulate_length(movie.attributes.title) %></h3>
     </div>
-  </script>
- 
+    <h5>Description</h5>
+    <p class="description"><%= movie.get('summary') %></p>
+  </div>
+</script>
+
 <script type="text/template" id="review_template">
-<div class="container">
+  <div class="container">
     <% _.each(reviews, function(review) { %>
-    <div class="well">           
-      <div class="row-fluid">
-        <p class="span12">
-        <strong><%= review.attributes.user.username %></strong> (<% print(moment(review.attributes.updated_at).fromNow()) %>).
-        </p>
-      <span class="badge badge-info pull-right">
-        <%= review.attributes.score %> points
-      </span>
+      <div class="well">           
+        <div class="row-fluid">
+          <p class="span12">
+            <strong><%= review.attributes.user.username %></strong> (<% print(moment(review.attributes.updated_at).fromNow()) %>).
+          </p>
+          <span class="badge badge-info pull-right">
+            <%= review.attributes.score %> points
+          </span>
+        </div>
+        <div class="row-fluid">
+          <p class="span9"><%= review.attributes.comment %></p>
+        </div> 
       </div>
-      <div class="row-fluid">
-        <p class="span9"><%= review.attributes.comment %></p>
-    </div> 
-      </div>
-    <% }); %>
-</div>
+      <% }); %>
+  </div>
 </script>
+
 <script type="text/template" id="write_review_template">
-<form class="new-review-form form-horizontal">
-<div class="well container">
-  <input name="id" type="hidden" value="<%= id %>">
-  <div class="control-group">
-    <label class="control-label" for="review_score">Score (1-100)</label>
-    <div class="controls">
-      <input id="review_score" name="score" type="number" min="1" max="100" value="">
+  <form class="new-review-form form-horizontal">
+    <div class="well container">
+      <input name="id" type="hidden" value="<%= id %>">
+      <div class="control-group">
+        <label class="control-label" for="review_score">Score (1-100)</label>
+        <div class="controls">
+          <input id="review_score" name="score" type="number" min="1" max="100" value="">
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="review_comment">Comment</label>
+        <div class="controls">
+          <textarea class="span9" cols="40" id="review_comment" name="comment" rows="3"value=""></textarea>
+        </div>
+      </div>
+      <div class="control-group">
+        <div class="controls">
+          <input class="btn" type="submit" value="Create Review">
+        </div>
+      </div>
     </div>
-  </div>
-  <div class="control-group">
-    <label class="control-label" for="review_comment">Comment</label>
-    <div class="controls">
-      <textarea class="span9" cols="40" id="review_comment" name="comment" rows="3"value=""></textarea>
-    </div>
-  </div>
-  <div class="control-group">
-  <div class="controls">
-    <input class="btn" type="submit" value="Create Review">
-  </div>
-  </div>
-  </div>
-</form>
+  </form>
 </script>
+
+ <%= session[:access_token]%>
+  <%= session[:current_user_email]%>
+  <%= session[:current_user_id] %>
+   <%=javascript_include_tag "jquery-1.10.2.min"%>
+   <%=javascript_include_tag "underscore-min"%>
+   <%=javascript_include_tag "bootstrap.min"%>
+   <%=javascript_include_tag "backbone-min"%>
+   <%=javascript_include_tag "zope"%>
