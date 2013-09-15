@@ -222,6 +222,7 @@ var MoviePage = Backbone.View.extend({
 
         'submit .new-review-form' : 'saveReview',
         'click .delete-movie': 'deleteMovie',
+        'click .edit-movie' : 'editMovie'
 
     },
     saveReview: function(ev) {
@@ -269,6 +270,9 @@ var MoviePage = Backbone.View.extend({
                 NProgress.done();
             }
         });
+    },
+    editMovie: function(ev) {
+        app_router.navigate('/movie/' + movie.id + '/edit', {trigger:true});
     }
 });
 
