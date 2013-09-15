@@ -32,28 +32,19 @@ $(document).on('click', 'a', function(event) {
     }
 });
 
-// var loadTemplates = function (names, callback) {
+window.onbeforeunload = function(evt) {
+    var fragment = Backbone.history.getFragment($(this).attr('href'));
+    var matched = _.any(Backbone.history.handlers, function(handler) {
+        return handler.route.test(fragment);
+    });
+    if (matched) {
+        event.preventDefault();
+        Backbone.history.navigate(fragment, { trigger: true });
+    }
+}
 
-//     var that = this;
-
-//     var loadTemplate = function (index) {
-//         var name = names[index];
-//         //console.log('Loading template: ' + name);
-//         $.get('templates/' + name + '.html', function (data) {
-//             that.templates[name] = data;
-//             index++;
-//             if (index < names.length) {
-//                 loadTemplate(index);
-//             } else {
-//                 callback();
-//             }
-//         });
-//     }
-
-//     loadTemplate(0);
-// };
-// Backbone.emulateHTTP = true; // Use _method parameter rather than using DELETE and PUT methods
-// Backbone.emulateJSON = true; // Send data to server via parameter rather than via request content
+Backbone.emulateHTTP = true; // Use _method parameter rather than using DELETE and PUT methods
+Backbone.emulateJSON = true; // Send data to server via parameter rather than via request content
 var Movie = Backbone.Model.extend({
     initialize: function() {
         //this.on('all', function(e) { console.log(this.get('title') + " event for single movie: " + e); });
@@ -134,6 +125,7 @@ var MovieCreationView = Backbone.View.extend({
     render : function(id) {
         var template = _.template( $("#movie_creation").html(), {} );
         this.$el.html(template);
+        NProgress.done();
     },
     events: {
         'submit .new_movie' : 'submitNewMovie',
@@ -190,7 +182,6 @@ var MovieListView = Backbone.View.extend({
         this.render();
     },
     render: function() {
-        NProgress.start();
         var self = this;
         var movieListModel = new MovieList();
 
@@ -218,15 +209,15 @@ var MoviePage = Backbone.View.extend({
     render: function (choice){
         NProgress.start();
         switch(choice) {
-        case 1:
-        var template = _.template( $("#movie_info_template").html(), {movie: movie} );
-        $("#list_container").html(template);
-        break;
-        case 2:
-        var write_review_template = _.template( $("#write_review_template").html(), {id:movie.get("id")} );
-        $("#list_container").append(write_review_template);
-        break;
-    }
+            case 1:
+            var template = _.template( $("#movie_info_template").html(), {movie: movie} );
+            $("#list_container").html(template);
+            break;
+            case 2:
+            var write_review_template = _.template( $("#write_review_template").html(), {id:movie.get("id")} );
+            $("#list_container").append(write_review_template);
+            break;
+        }
         NProgress.done();
     },
     events: {
@@ -301,19 +292,22 @@ var ReviewView = Backbone.View.extend ({
 });
 
 
-    // Initiate the router
-    var app_router = new AppRouter();
+// Initiate the router
+var app_router = new AppRouter();
 
-    app_router.on('route:defaultRoute', function(actions) {
-        var movieListView = new MovieListView({ el: $("#list_container") });
-    });
-    app_router.on('route:viewMovieDetails', function(id) {
-        if (typeof moviePage == 'undefined') {
-            moviePage = new MoviePage({ el: $("#list_container") });
-        }    
-        movie.set({id:id});
-        movie.fetch({
-            success: function(movie) {
+
+app_router.on('route:defaultRoute', function(actions) {
+    NProgress.start();
+    var movieListView = new MovieListView({ el: $("#list_container") });
+});
+app_router.on('route:viewMovieDetails', function(id) {
+    NProgress.start();
+    if (typeof moviePage == 'undefined') {
+        moviePage = new MoviePage({ el: $("#list_container") });
+    }    
+    movie.set({id:id});
+    movie.fetch({
+        success: function(movie) {
                 //console.log(movie.toJSON());
                 reviews = new Reviews({id:id});
                 reviews.fetch({
@@ -327,23 +321,26 @@ var ReviewView = Backbone.View.extend ({
             }
         });
 
-    });
-    app_router.on('route:createNewMovie', function() {
-        var movieCreationView = new MovieCreationView({ el: $("#list_container") });
-        movieCreationView.render();
-    });
-    app_router.on('route:viewUserProfile', function() {
 
-    });
+});
+app_router.on('route:createNewMovie', function() {
+    NProgress.start();
+    var movieCreationView = new MovieCreationView({ el: $("#list_container") });
+    movieCreationView.render();
+});
+app_router.on('route:viewUserProfile', function() {
 
-    // Start Backbone history a necessary step for bookmarkable URL's
-    Backbone.history.start({pushState: true,
-        root: "/"});
+});
 
-function regulate_length(long_string, max_length){
+// Start Backbone history a necessary step for bookmarkable URL's
+Backbone.history.start({pushState: true,
+    root: "/"});
 
-    if (long_string.length > max_length - 3){
-        long_string = long_string.substring(0, max_length - 3) + '...';
+function regulate_length(long_string){
+    var max_length = 23;
+
+    if (long_string.length >= max_length - 3){
+        long_string = long_string.substring(0, max_length - 4) + '...';
     }
 
     return long_string;
