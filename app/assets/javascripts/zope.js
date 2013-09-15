@@ -71,6 +71,15 @@ var AppRouter = Backbone.Router.extend({
     }
 });
 
+var MovieItem = Backbone.Model.extend({
+    initialize: function() {
+
+    },
+    render: function() {
+
+    }
+})
+
 var MovieCreation = Backbone.View.extend({
     el: '.list_container',
     render : function(id) {
