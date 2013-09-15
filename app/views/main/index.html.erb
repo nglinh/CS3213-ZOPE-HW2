@@ -4,7 +4,9 @@
   <title>Movie Gallery</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Bootstrap -->
-  <%=stylesheet_link_tag "bootstrap.min.css"%>
+  <%=stylesheet_link_tag "bootstrap.min"%>
+  <%=stylesheet_link_tag "home"%>
+  <%=stylesheet_link_tag "nprogress"%>
 </head>
 
 <body>
@@ -14,7 +16,7 @@
       <div class='row'>
         <%% _.each(movies, function(movie) { %> 
           <div class="span3 movie">
-            <a href="movie/<%%= movie.attributes.id %>">
+            <a id="detail_page" href="movie/<%%= movie.attributes.id %>">
               <h4 class="movie-title"><%%= regulate_length(movie.attributes.title) %></h4>
               <img class= "img-rounded" src=<%%= movie.attributes.img_url %>>
               <p>Score: <%%= regulate_decimal_points(movie.attributes.avg_score) %></p>
@@ -57,7 +59,7 @@
     </div>
   </script>
 
-  <div class="navbar navbar-inverse navbar-fixed-top">
+  <div class="navbar navbar-inverse">
     <div class="navbar-inner">
       <div class="container">
         <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
@@ -85,6 +87,7 @@
   <%=javascript_include_tag "bootstrap.min"%>
   <%=javascript_include_tag "backbone-min"%>
   <%=javascript_include_tag "moment.min"%>
+  <%=javascript_include_tag "nprogress"%>
   <%=javascript_include_tag "zope"%>
 
   <%= javascript_tag do %>
