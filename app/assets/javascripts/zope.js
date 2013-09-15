@@ -43,8 +43,6 @@ window.onbeforeunload = function(evt) {
     }
 }
 
-Backbone.emulateHTTP = true; // Use _method parameter rather than using DELETE and PUT methods
-Backbone.emulateJSON = true; // Send data to server via parameter rather than via request content
 var Movie = Backbone.Model.extend({
     initialize: function() {
         //this.on('all', function(e) { console.log(this.get('title') + " event for single movie: " + e); });
