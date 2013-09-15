@@ -21,28 +21,6 @@ $.fn.serializeObject = function() {
 };
 
 
-$(document).on('click', 'a', function(event) {
-    var fragment = Backbone.history.getFragment($(this).attr('href'));
-    var matched = _.any(Backbone.history.handlers, function(handler) {
-        return handler.route.test(fragment);
-    });
-    if (matched) {
-        event.preventDefault();
-        Backbone.history.navigate(fragment, { trigger: true });
-    }
-});
-
-window.onbeforeunload = function(evt) {
-    var fragment = Backbone.history.getFragment($(this).attr('href'));
-    var matched = _.any(Backbone.history.handlers, function(handler) {
-        return handler.route.test(fragment);
-    });
-    if (matched) {
-        event.preventDefault();
-        Backbone.history.navigate(fragment, { trigger: true });
-    }
-}
-
 var Movie = Backbone.Model.extend({
     initialize: function() {
         //this.on('all', function(e) { console.log(this.get('title') + " event for single movie: " + e); });
