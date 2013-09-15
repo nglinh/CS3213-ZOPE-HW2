@@ -282,7 +282,6 @@ var MoviePage = Backbone.View.extend({
     events: {
         'submit .new-review-form' : 'saveReview',
         'click .delete-movie': 'deleteMovie',
-        'click .edit-movie' : 'editMovie'
 
     },
     saveReview: function(ev) {
@@ -330,16 +329,12 @@ var MoviePage = Backbone.View.extend({
                 NProgress.done();
             }
         });
-    },
-    editMovie: function(ev) {
-        app_router.navigate('/movie/' + movie.id + '/edit', {trigger:true});
     }
 });
 
 var ReviewView = Backbone.View.extend ({
     initialize: function(option) {
         this.model = option.review;
-        this.el = option.el;
     },
     render: function() {
         var review_template = _.template($("#review_template").html(), {review: this.model, login_user:getUser()});
@@ -349,7 +344,7 @@ var ReviewView = Backbone.View.extend ({
         'click .delete-review' : 'deleteReview'
     },
     deleteReview: function () {
-        alert(this.model.get("id"));
+        alert(model.get("id"));
     }
 });
 
@@ -433,14 +428,16 @@ function getUser() {
         username: window.user_email
     };
 }
+function deleteReview() {
+    alert("delete");
+}
 
 function renderReviews(reviews) {
     for (var i =0;i< reviews.length;i++) {
         var review = reviews.at(i);
-        var elid = "#"+review.get("id");
-        $("#list_container").append('<div class="productView'+review.id+'">');
-        var reviewView = new ReviewView({el: $('.productView'+review.id), review:review});
-        $("#list_container").append('</div>');
+        console.log("Review is: " );
+        console.log(review);
+        var reviewView = new ReviewView({el:$(".container"+review.get("id")), review:review});
         reviewView.render();
     }
 }
