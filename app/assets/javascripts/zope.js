@@ -11,8 +11,20 @@ $.fn.serializeObject = function() {
           o[this.name] = this.value || '';
       }
   });
-    return o;
+  return o;
 };
+
+
+$(document).on('click', 'a', function(event) {
+    var fragment = Backbone.history.getFragment($(this).attr('href'));
+    var matched = _.any(Backbone.history.handlers, function(handler) {
+        return handler.route.test(fragment);
+    });
+    if (matched) {
+        event.preventDefault();
+        Backbone.history.navigate(fragment, { trigger: true });
+    }
+});
 
 // var loadTemplates = function (names, callback) {
 
@@ -74,7 +86,7 @@ var Review = Backbone.Model.extend({
     urlRoot: "http://cs3213.herokuapp.com/movies/",
     url: function() {
         var base = this.urlRoot || (this.collection && this.collection.url) || "/";
-        return base  + (this.id) + ".json/reviews.json";
+        return base  + (this.movie_id) + ".json/reviews.json";
     },
 });
 
@@ -147,9 +159,9 @@ var MovieListView = Backbone.View.extend({
         this.render();
     },
     render: function() {
-       var self = this;
-       var movieListModel = new MovieList();
-       movieListModel.fetch({
+     var self = this;
+     var movieListModel = new MovieList();
+     movieListModel.fetch({
         success: function (movieListModel){
             console.log(movieListModel);
             var template = _.template($("#movieListTemplate").html(), {movies: movieListModel.models});
@@ -177,6 +189,7 @@ var MoviePage = Backbone.View.extend({
         $("#list_container").append(write_review_template);
     },
     events: {
+
         'submit .new-review-form' : 'saveReview',
         'click btn': 'deleteMovie'
     },
@@ -197,6 +210,7 @@ var MoviePage = Backbone.View.extend({
             }
         });
         return false;
+
     },
     deleteMovie: function(ev) {
         movie.delete({
@@ -243,21 +257,25 @@ var MoviePage = Backbone.View.extend({
     });
 
     // Start Backbone history a necessary step for bookmarkable URL's
-    Backbone.history.start();
+    Backbone.history.start({pushState: true,
+        root: "/"});
 
-function regulate_length(long_string, max_length){
+    function regulate_length(long_string){
+        var max_length = 24;
 
-    if (long_string.length > max_length - 3){
-        long_string = long_string.substring(0, max_length - 3) + '...';
+        if (long_string.length > max_length - 3){
+            long_string = long_string.substring(0, max_length - 3) + '...';
+        }
+
+        return long_string;
     }
 
-    return long_string;
-}
+    function regulate_decimal_points(number){
+        var decimal_points = 2;
+        var zeros = decimal_points * 10;
+        return parseFloat(Math.round(number * zeros) / zeros).toFixed(decimal_points);
+    }
 
-function regulate_decimal_points(number, decimal_points){
-    var zeros = decimal_points * 10;
-    return parseFloat(Math.round(number * zeros) / zeros).toFixed(decimal_points);
-}
 
 function getAccessToken() {
     return window.access_token;

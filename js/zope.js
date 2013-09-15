@@ -225,7 +225,8 @@ var MoviePage = Backbone.View.extend({
     // Start Backbone history a necessary step for bookmarkable URL's
     Backbone.history.start();
 
-function regulate_length(long_string, max_length){
+function regulate_length(long_string){
+    var max_length = 24;
 
     if (long_string.length > max_length - 3){
         long_string = long_string.substring(0, max_length - 3) + '...';
@@ -234,8 +235,10 @@ function regulate_length(long_string, max_length){
     return long_string;
 }
 
-function regulate_decimal_points(number, decimal_points){
+function regulate_decimal_points(number){
+    var decimal_points = 2;
     var zeros = decimal_points * 10;
+    console.log(number);
     return parseFloat(Math.round(number * zeros) / zeros).toFixed(decimal_points);
 }
 
