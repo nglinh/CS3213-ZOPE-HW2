@@ -2,6 +2,7 @@ Cs3213HW2::Application.routes.draw do
 
   get '/index' => 'main#index'
   get '/login' => 'main#login'
+  get '/logout' => 'main#logout'
   get '/callback' => 'main#callback'
 
   root 'main#index'
