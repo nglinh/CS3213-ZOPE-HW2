@@ -27,28 +27,28 @@
     <div class='container'>
       <div><h3>Create new movie</h3>
 
-        <form name="movie" method="POST">
+        <form name="new_movie" class="simple-form new_movie" method="POST">
           <div class="control-group">
-            <label class="control-label" for="movie_title">Title</label>
+            <label class="control-label" for="movie-title">Title</label>
             <div class="controls">
-            <input class="text_field" id="movie_title" name="movie[title]" size="30" type="text" required="true">
+            <input class="text_field" id="movie-title" name="movie[title]" size="30" type="text" required="true">
             </div>
             </div>
             <div class="control-group">
-            <label class="control-label" for="movie_summary">Summary</label>
+            <label class="control-label" for="movie-summary">Summary</label>
             <div class="controls">
-            <input class="text_field" id="movie_summary" name="movie[summary]" size="30" type="text" required="true">
+            <input class="text_field" id="movie-summary" name="movie[summary]" size="30" type="text" required="true">
             </div>
           </div>
 
           <div class="control-group">
-            <label class="control-label" for="movie_img">Img</label>
+            <label class="control-label" for="movie-img">Img</label>
             <div class="controls">
             <input id="movie_img" name="movie[img]" type="file" required="true">
             </div>
           </div>
 
-          <a class="btn btn-primary" id="submit">Create Movie</a>
+          <input class="btn btn-primary" type="submit">Create Movie</input>
           <a href="#" id="cancel" class="btn">Cancel</a>
         </form>
       </div>
@@ -68,6 +68,7 @@
           <ul class="nav">
             <li class="active"><a href="#">List All</a></li>
             <li><a href="/login">Sign in</a></li>
+            <li><a href="/#/new">Add New Movie</a></li>
           </ul>
         </div><!--/.nav-collapse -->
       </div>
@@ -81,6 +82,7 @@
   <%= session[:current_user_email]%>
   <%= session[:current_user_id] %>
   <%=javascript_include_tag "jquery-1.10.2.min"%>
+  <%=javascript_include_tag "jquery.form.min"%>
   <%=javascript_include_tag "underscore-min"%>
   <%=javascript_include_tag "bootstrap.min"%>
   <%=javascript_include_tag "backbone-min"%>

@@ -96,17 +96,6 @@ var Reviews = Backbone.Collection.extend({
     
 });
 
-// To be used in the furute development
-// var movie = new Movie({id:movie_id});
-// movie.fetch(); // fetch model from DB with id = 1
-
-// movie = new Movie({title:"Joe Zim", summary:'Good story'});
-// movie.save(); // create and save a new model on the server, also get id back and set it
-
-// movie = new movie({id:1, name:"Joe Zim", age:23});
-// movie.save(); // update the model on the server (it has an id set, therefore it is on the server already)
-// movie.destroy(): // delete the model from the server
-
 var MovieList = Backbone.Collection.extend({
     initialize: function() {
         //this.on('all', function(e) { console.log(e); });
@@ -124,21 +113,106 @@ var AppRouter = Backbone.Router.extend({
     }
 });
 
-var MovieItem = Backbone.Model.extend({
-    initialize: function() {
-
-    },
-    render: function() {
-
-    }
-})
-
-var MovieCreation = Backbone.View.extend({
-    el: '.list_container',
+var MovieCreationView = Backbone.View.extend({
     render : function(id) {
         var template = _.template( $("#movie_creation").html(), {} );
         this.$el.html(template);
+    },
+    events: {
+        'submit .new_movie' : 'submitNewMovie',
+    },
+    // submitNewMovie: function(ev) {
+    //     console.log("Adding New Movie!");
+    //     console.log(ev);
+    //     var newMovieDetail = $(ev.currentTarget).serializeObject();
+        
+    //     newMovieDetail.access_token = getAccessToken();
+    //     //newMovieDetail.user = getUser();
+
+    //     var files = ev.currentTarget[2].files;
+    //     newMovieDetail.img = files[0];
+
+    //     var newMovie = new MovieCreationModel();
+    //     console.log(newMovieDetail);
+
+    //     // // fire off the request to /form.php
+    //     // request = $.ajax({
+    //     //     url: "http://cs3213.herokuapp.com/movies.json",
+    //     //     type: "post",
+    //     //     data: newMovieDetail
+    //     // });
+
+    //     // // callback handler that will be called on success
+    //     // request.done(function (response, textStatus, jqXHR){
+    //     //     // log a message to the console
+    //     //     console.log("Hooray, it worked!");
+    //     // });
+
+    //     // // callback handler that will be called on failure
+    //     // request.fail(function (jqXHR, textStatus, errorThrown){
+    //     //     // log the error to the console
+    //     //     console.error(
+    //     //         "The following error occured: "+
+    //     //         textStatus, errorThrown
+    //     //     );
+    //     // });
+
+    //     newMovie.save(newMovieDetail, {
+    //         success: function (newMovieDetail) {
+    //             alert("success!");
+    //             console.log('Successfully created a new movie!');
+    //         },
+    //         error: function (){
+    //             alert("You are not allowed to create a newMovie");
+    //         }
+    //     });
+
+    //     return false; // Don't do the form's default action
+    // }
+
+    submitNewMovie: function(e){
+        var access_token = getAccessToken();
+        
+        if (access_token === ""){
+            alert("Please Login");
+            return false;
+        }
+
+        console.log('Adding new movie');
+        $(e.target).closest('form').ajaxSubmit({
+            url: 'http://cs3213.herokuapp.com/movies.json',
+            dataType: 'application/json',
+            data: {
+                access_token: access_token
+            },
+            method: 'POST',
+            error: function(e){
+                console.log(e);
+                console.log("ajax call to create movie failed");
+            },
+            success: function(e){
+                console.log(e);
+                console.log("ajax call to create movie succeeded");
+            },
+            beforeSubmit: function(e){
+
+            }
+        });
+        //app_router.navigate('/', {trigger:true});
+        return false;
     }
+});
+
+var MovieCreationModel = Backbone.Model.extend({
+    defaults: {
+        title: 'NA',
+        summary: 'NA',
+        img: 'NA',
+        access_token: 'NA',
+    },
+    url: function() {
+        return "http://cs3213.herokuapp.com/movies.json";
+    },
 });
 
 var MovieListView = Backbone.View.extend({
@@ -235,8 +309,8 @@ var MoviePage = Backbone.View.extend({
         });
     });
     app_router.on('route:createNewMovie', function() {
-        var movieCreation = new MovieCreation({ el: $("#list_container") });
-        movieCreation.render();
+        var movieCreationView = new MovieCreationView({ el: $("#list_container") });
+        movieCreationView.render();
     });
     app_router.on('route:viewUserProfile', function() {
 
@@ -246,11 +320,9 @@ var MoviePage = Backbone.View.extend({
     Backbone.history.start();
 
 function regulate_length(long_string, max_length){
-
     if (long_string.length > max_length - 3){
         long_string = long_string.substring(0, max_length - 3) + '...';
     }
-
     return long_string;
 }
 
