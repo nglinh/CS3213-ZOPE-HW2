@@ -4,6 +4,8 @@ ruby "2.0.0"
 
 gem 'oauth'
 
+gem 'twitter-bootstrap-rails', :git => 'git://github.com/seyhunak/twitter-bootstrap-rails.git'
+
 group :development do
 	gem 'sqlite3'
 end

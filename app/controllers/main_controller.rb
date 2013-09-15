@@ -3,6 +3,7 @@
 class MainController < ApplicationController
 require 'uri'
 require 'net/http'
+require 'socket'
 
 PROVIDER = 'https://cs3213.herokuapp.com'
 APP_ID = '38313a31bcc76429957ba97fdd2b9404'
@@ -15,6 +16,11 @@ end
 
 def login
 	redirect_to "#{PROVIDER}/oauth/new?client_id=#{APP_ID}&redirect_uri=#{CALL_BACK_URL}"
+end
+
+def logout
+	session.clear
+	redirect_to "/"
 end
 
 def callback
@@ -32,7 +38,7 @@ def callback
 	session[:current_user_email] = user_json["email"]
 	session[:current_user_id] = user_json["id"]
 
-	redirect_to '/index'
+	redirect_to '/'
 end
 
 private

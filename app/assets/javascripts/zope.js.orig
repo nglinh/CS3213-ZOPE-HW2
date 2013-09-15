@@ -139,6 +139,54 @@ var MovieCreationView = Backbone.View.extend({
     events: {
         'submit .new_movie' : 'submitNewMovie',
     },
+    // submitNewMovie: function(ev) {
+    //     console.log("Adding New Movie!");
+    //     console.log(ev);
+    //     var newMovieDetail = $(ev.currentTarget).serializeObject();
+        
+    //     newMovieDetail.access_token = getAccessToken();
+    //     //newMovieDetail.user = getUser();
+
+    //     var files = ev.currentTarget[2].files;
+    //     newMovieDetail.img = files[0];
+
+    //     var newMovie = new MovieCreationModel();
+    //     console.log(newMovieDetail);
+
+    //     // // fire off the request to /form.php
+    //     // request = $.ajax({
+    //     //     url: "http://cs3213.herokuapp.com/movies.json",
+    //     //     type: "post",
+    //     //     data: newMovieDetail
+    //     // });
+
+    //     // // callback handler that will be called on success
+    //     // request.done(function (response, textStatus, jqXHR){
+    //     //     // log a message to the console
+    //     //     console.log("Hooray, it worked!");
+    //     // });
+
+    //     // // callback handler that will be called on failure
+    //     // request.fail(function (jqXHR, textStatus, errorThrown){
+    //     //     // log the error to the console
+    //     //     console.error(
+    //     //         "The following error occured: "+
+    //     //         textStatus, errorThrown
+    //     //     );
+    //     // });
+
+    //     newMovie.save(newMovieDetail, {
+    //         success: function (newMovieDetail) {
+    //             alert("success!");
+    //             console.log('Successfully created a new movie!');
+    //         },
+    //         error: function (){
+    //             alert("You are not allowed to create a newMovie");
+    //         }
+    //     });
+
+    //     return false; // Don't do the form's default action
+    // }
 
     submitNewMovie: function(e){
         var access_token = getAccessToken();
@@ -302,20 +350,30 @@ var MoviePage = Backbone.View.extend({
     Backbone.history.start({pushState: true,
         root: "/"});
 
+<<<<<<< HEAD
 function regulate_length(long_string, max_length){
-
     if (long_string.length > max_length - 3){
         long_string = long_string.substring(0, max_length - 3) + '...';
     }
-
     return long_string;
 }
+=======
+    function regulate_length(long_string){
+        var max_length = 24;
+
+        if (long_string.length > max_length - 3){
+            long_string = long_string.substring(0, max_length - 3) + '...';
+        }
+
+        return long_string;
+    }
 
     function regulate_decimal_points(number){
         var decimal_points = 2;
         var zeros = decimal_points * 10;
         return parseFloat(Math.round(number * zeros) / zeros).toFixed(decimal_points);
     }
+>>>>>>> 6fd9fbbaebb62d465b9ab4af3371850d1b72ac00
 
 
     function getAccessToken() {
