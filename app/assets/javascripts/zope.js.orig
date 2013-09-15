@@ -4,6 +4,7 @@ $(document).ready(function () {
     NProgress.done();
 });
 
+<<<<<<< HEAD
 function add_file_button(){
     var change_img_button = $('.movie-img');
     if ($('.movie-img').html() === 'Change Img'){
@@ -45,6 +46,8 @@ function switch_to_page(number){
     app_router.navigate("page/" + number, {trigger: true});
 }
 
+=======
+>>>>>>> 9ef120532989f47d6f91810ee09ba9279d62c611
 $.fn.serializeObject = function() {
   var o = {};
   var a = this.serializeArray();
@@ -157,7 +160,6 @@ var AppRouter = Backbone.Router.extend({
         "page/:movie_page_id": "movie_in_page",
         "": "defaultRoute",
         "movie/:id": "viewMovieDetails",
-        "movie/:id/edit": "editMovieDetails",        
         "new": "createNewMovie",
     }
 });
@@ -194,7 +196,12 @@ var MovieCreationView = Backbone.View.extend({
             },
             success: function(e){
                 console.log(e);
+<<<<<<< HEAD
                 alert("Create movie succeeded");
+                app_router.navigate("/movie/" + e.id, {target:true});
+=======
+                console.log("ajax call to create movie succeeded");
+>>>>>>> 9ef120532989f47d6f91810ee09ba9279d62c611
             },
             beforeSubmit: function(e){
 
@@ -217,6 +224,7 @@ var MovieCreationModel = Backbone.Model.extend({
     },
 });
 
+<<<<<<< HEAD
 var page_number = 1;
 
 var MovieEditView = Backbone.View.extend({
@@ -269,6 +277,8 @@ var MovieEditView = Backbone.View.extend({
     }
 });
 
+=======
+>>>>>>> 9ef120532989f47d6f91810ee09ba9279d62c611
 var MovieListView = Backbone.View.extend({
     initialize: function() {
 
@@ -436,6 +446,7 @@ app_router.on('route:viewMovieDetails', function(id) {
                 });
             }
         });
+<<<<<<< HEAD
 });
 
 app_router.on('route:editMovieDetails', function(id){
@@ -454,6 +465,15 @@ app_router.on('route:movie_in_page', function(id) {
     console.log('Going to page: ' + id);
     page_number = parseInt(id);
     var movieListView = new MovieListView({ el: $("#list_container") });
+=======
+
+
+});
+app_router.on('route:createNewMovie', function() {
+    NProgress.start();
+    var movieCreationView = new MovieCreationView({ el: $("#list_container") });
+    movieCreationView.render();
+>>>>>>> 9ef120532989f47d6f91810ee09ba9279d62c611
 });
 
 
