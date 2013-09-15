@@ -8,7 +8,7 @@ require 'socket'
 PROVIDER = 'https://cs3213.herokuapp.com'
 APP_ID = '38313a31bcc76429957ba97fdd2b9404'
 APP_SECRET = 'fd9338dab2c23e99bde73b649458a11a'
-CALL_BACK_URL = "http://localhost:3000/callback"
+CALL_BACK_URL = "http://frozen-lowlands-3487.herokuapp.com/callback"
 
 def index
 
