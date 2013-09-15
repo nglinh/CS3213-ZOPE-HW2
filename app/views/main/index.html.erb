@@ -17,7 +17,7 @@
         <%% _.each(movies, function(movie) { %> 
           <div class="span3 movie">
             <a id="detail_page" href="movie/<%%= movie.attributes.id %>">
-              <h4 class="movie-title"><%%= regulate_length(movie.attributes.title, 23) %></h4>
+              <h4 class="movie-title"><%%= regulate_length(movie.attributes.title) %></h4>
               <img class= "img-rounded" src=<%%= movie.attributes.img_url %>>
               <p>Score: <%%= regulate_decimal_points(movie.attributes.avg_score) %></p>
             </a>
@@ -35,13 +35,13 @@
           <div class="control-group">
             <label class="control-label" for="movie-title">Title</label>
             <div class="controls">
-              <input class="text_field" id="movie_title" name="movie[title]" size="30" type="text" required="true" value="addf">
+            <input class="text_field" id="movie_title" name="movie[title]" size="30" type="text" required="true">
             </div>
-          </div>
-          <div class="control-group">
+            </div>
+            <div class="control-group">
             <label class="control-label" for="movie_summary">Summary</label>
             <div class="controls">
-              <input class="text_field" id="movie_summary" name="movie[summary]" size="30" type="text" required="true">
+            <input class="text_field" id="movie_summary" name="movie[summary]" size="30" type="text" required="true">
             </div>
           </div>
 
@@ -52,43 +52,7 @@
             </div>
           </div>
 
-          <input class="btn btn-primary" type="submit"></input>
-          <a href="#" id="cancel" class="btn">Cancel</a>
-        </form>
-      </div>
-    </div>
-  </script>
-
-  <script type="text/template" id="movie_edit">
-    <div class='container'>
-      <div><h3>Edit Movie</h3>
-
-        <form name="new_movie" class="simple-form edit_movie" method="POST">
-          <div class="control-group">
-            <label class="control-label" for="movie-title">Title</label>
-            <div class="controls">
-            <input class="text_field" id="movie_title" name="movie[title]" size="30" type="text" required="true" value="<%%= movie.attributes.title%>">
-            <input class="text_field" id="movie_id" name="movie[id]" size="30" type="hidden" value="<%%= movie.attributes.id%>">
-            </div>
-            </div>
-            <div class="control-group">
-            <label class="control-label" for="movie_summary">Summary</label>
-            <div class="controls">
-            <input class="text_field" id="movie_summary" name="movie[summary]" size="30" type="text" required="true" value="<%%= movie.attributes.summary%>">
-            </div>
-          </div>
-            
-          <img src=<%%= movie.attributes.img_url%>>
-
-          <div class="control-group">
-            <br>
-            <div class="btn movie-img" onclick="add_file_button()">Change Img</div>
-            <br></br>
-            <div class="controls movie-file-holder">
-            </div>
-          </div>
-
-          <input class="btn btn-primary" type="submit"></input>
+          <input class="btn btn-primary" type="submit">Create Movie</input>
           <a href="#" id="cancel" class="btn">Cancel</a>
         </form>
       </div>
@@ -109,8 +73,8 @@
           <p class = pull-right id="user_email" style="padding-top: 10px; color: white">Guest User</p>
           <ul class="nav">
             <li class="active"><a href="#">List All</a></li>
-            <li><a href="/login" id="sign_link">Sign in</a></li>
-            <li><a href="/new">Add New Movie</a></li>
+            <li><a href="/login">Sign in</a></li>
+            <li><a href="/#/new">Add New Movie</a></li>
           </ul>
         </div><!--/.nav-collapse -->
       </div>
@@ -158,7 +122,8 @@
       </div>
       <h3 class="muted text-cente"><%%= regulate_length(movie.attributes.title) %></h3>
     <div>
-      <button class="delete-movie btn btn-danger" value=>Delete</button>
+      <button class="edit-movie btn btn-inverse" >Edit</button>
+      <button class="delete-movie btn btn-danger">Delete</button>
     </div>
     </div>
     <h5>Description</h5>
@@ -168,7 +133,7 @@
 </script>
 
 <script type="text/template" id="review_template">
-  <div class="container<%%= review.attributes.id %>">
+  <div class="container" id="<%%= review.attributes.id %>">
       <div class="well">           
         <div class="row-fluid">
           <p class="span12">
@@ -183,7 +148,7 @@
         </div> 
         <div>
           <%% if(login_user.id == review.attributes.user.id) {%>
-            <button class="delete-review btn btn-danger" value="Delete Review">Delete Review</button>
+            <button class="delete-review btn btn-danger" >Delete Review</button>
             <%%}%>
           </div>
         </div>
