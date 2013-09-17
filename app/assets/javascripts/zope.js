@@ -436,9 +436,6 @@ app_router.on('route:defaultRoute', function(actions) {
 app_router.on('route:viewMovieDetails', function(id) {
     NProgress.start();
     
-    if (typeof moviePage != 'undefined') {
-        moviePage.remove();
-    }
     moviePage = new MoviePage({ el: $("#list_container") });
         
     movie.set({id:id});
