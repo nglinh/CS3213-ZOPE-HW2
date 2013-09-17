@@ -191,7 +191,7 @@ var MovieCreationView = Backbone.View.extend({
             method: 'POST',
             processData: true,
             success: function(e){
-                parse_response();
+                parse_response(e);
             },
             error: function(e){
                 parse_response(e);
