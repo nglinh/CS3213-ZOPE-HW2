@@ -191,7 +191,7 @@ var MovieCreationView = Backbone.View.extend({
             method: 'POST',
             processData: true,
             success: function(e){
-                parse_response();
+                parse_response(e);
             },
             error: function(e){
                 parse_response(e);
@@ -435,6 +435,9 @@ app_router.on('route:defaultRoute', function(actions) {
 app_router.on('route:viewMovieDetails', function(id) {
     NProgress.start();
     
+    if (typeof moviePage != 'undefined') {
+        moviePage.remove();
+    }
     moviePage = new MoviePage({ el: $("#list_container") });
         
     movie.set({id:id});
