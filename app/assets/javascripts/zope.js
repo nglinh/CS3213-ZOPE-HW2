@@ -378,6 +378,7 @@ var MoviePage = Backbone.View.extend({
             success: function(model,response){
                 NProgress.done(true);
                 app_router.navigate("", {trigger: true});
+                return;
             },
             error: function(model,response){
                 alert("This movie cannot be deleted");
