@@ -1,8 +1,49 @@
 NProgress.configure({showSpinner: false});
 
 $(document).ready(function () {
-    NProgress.done();
+    NProgress.done(true);
 });
+
+function add_file_button(){
+    var change_img_button = $('.movie-img');
+    if ($('.movie-img').html() === 'Change Img'){
+        change_img_button.html('Remove Image Upload');
+        $('.movie-file-holder').html('<input id="movie_img" name="movie[img]" type="file" required="true">');
+    } else{
+        change_img_button.html('Change Img');
+        $('.movie-file-holder').html('');
+    }
+}
+
+function activate_page_button(){
+
+    $('.previous-page-button').on({
+        click: previous_page
+    });
+    $('.next-page-button').on({
+        click: next_page
+    });
+
+    if (page_number <= 1){
+        $('.previous-page-button').css({"display":"none"});
+    }
+}
+
+function previous_page(){
+    console.log('Previous Page');
+    page_number -= 1;
+    switch_to_page(page_number);
+}
+
+function next_page(){
+    console.log('Next Page');
+    page_number += 1;
+    switch_to_page(page_number);
+}
+
+function switch_to_page(number){
+    app_router.navigate("page/" + number, {trigger: true});
+}
 
 $.fn.serializeObject = function() {
   var o = {};
@@ -113,8 +154,10 @@ var MovieList = Backbone.Collection.extend({
 
 var AppRouter = Backbone.Router.extend({
     routes: {
+        "page/:movie_page_id": "movie_in_page",
         "": "defaultRoute",
         "movie/:id": "viewMovieDetails",
+        "movie/:id/edit": "editMovieDetails",        
         "new": "createNewMovie",
     }
 });
@@ -123,13 +166,14 @@ var MovieCreationView = Backbone.View.extend({
     render : function(id) {
         var template = _.template( $("#movie_creation").html(), {} );
         this.$el.html(template);
-        NProgress.done();
+        NProgress.done(true);
     },
     events: {
         'submit .new_movie' : 'submitNewMovie',
     },
 
     submitNewMovie: function(e){
+        NProgress.start();
         var access_token = getAccessToken();
         
         if (access_token === ""){
@@ -145,13 +189,12 @@ var MovieCreationView = Backbone.View.extend({
                 access_token: access_token
             },
             method: 'POST',
-            error: function(e){
-                console.log(e);
-                console.log("ajax call to create movie failed");
-            },
+            processData: true,
             success: function(e){
-                console.log(e);
-                console.log("ajax call to create movie succeeded");
+                parse_response();
+            },
+            error: function(e){
+                parse_response(e);
             },
             beforeSubmit: function(e){
 
@@ -161,6 +204,18 @@ var MovieCreationView = Backbone.View.extend({
         return false;
     }
 });
+
+function parse_response(e){
+    console.log(e);
+    if (e.status == 200){
+        alert("Create movie succeeded");
+        var responseText = JSON.parse(e.responseText);
+        app_router.navigate("movie/" + responseText.id, {trigger: true});
+    } else{
+        alert("Create movie failed");
+    }
+    NProgress.done(true);
+}
 
 var MovieCreationModel = Backbone.Model.extend({
     defaults: {
@@ -174,26 +229,85 @@ var MovieCreationModel = Backbone.Model.extend({
     },
 });
 
+var page_number = 1;
+
+var MovieEditView = Backbone.View.extend({
+    render : function(id) {
+        var movie = new Movie();
+        var that = this;
+        movie.id = id;
+        console.log("id is: " + id);
+        movie.fetch({
+            success: function(e){
+                console.log('successfully retrieved the movie');
+                var template = _.template( $("#movie_edit").html(), {movie: movie} );
+                that.$el.html(template);
+                NProgress.done(true);
+            },
+            error: function(e){
+                console.log('failed to retrieve movie');
+                NProgress.done(true);
+            }
+        });
+    },
+    events: {
+        'submit .edit_movie' : 'submitEditMovie',
+    },
+    submitEditMovie: function(e){
+        NProgress.start();
+        var access_token = getAccessToken();
+        
+        if (access_token === ""){
+            alert("Please Login");
+            return false;
+        }
+        var id = (e.currentTarget)[1].value;
+        $(e.target).closest('form').ajaxSubmit({
+            url: 'http://cs3213.herokuapp.com/movies/' + id + '.json',
+            dataType: 'application/json',
+            data: {
+                access_token: access_token
+            },
+            method: 'PUT',
+            error: function(e){
+                alert("This movie cannot be edited. Please check your permission");
+                NProgress.done(true);
+            },
+            success: function(e){
+                NProgress.done(true);
+                app_router.navigate("/movie/" + id, {trigger: true});
+            },
+            beforeSubmit: function(e){
+
+            }
+        });
+        return false;
+    }
+});
+
 var MovieListView = Backbone.View.extend({
     initialize: function() {
 
         this.render();
     },
     render: function() {
+        console.log("this renders");
         var self = this;
         var movieListModel = new MovieList();
+        movieListModel.url = "http://cs3213.herokuapp.com/movies.json" + "?page=" + page_number;
 
         movieListModel.fetch({
             success: function (movieListModel){
                 var template = _.template($("#movieListTemplate").html(), {movies: movieListModel.models});
                 self.$el.html(template);
-                NProgress.done();
+                NProgress.done(true);
+                activate_page_button();
             },
             error: function(model, xhr, options){
                 console.log(model);
                 console.log(xhr);
                 console.log(options);
-                NProgress.done();
+                NProgress.done(true);
             }
         });
         // Compile the template using underscore
@@ -253,6 +367,7 @@ var MoviePage = Backbone.View.extend({
 
     },
     deleteMovie: function(ev) {
+        NProgress.start();
 
         console.log(movie);
         movie.destroy({
@@ -261,13 +376,12 @@ var MoviePage = Backbone.View.extend({
             },
             processData: true,
             success: function(model,response){
-                alert("deleted");
-                NProgress.done();
+                NProgress.done(true);
                 app_router.navigate("", {trigger: true});
             },
             error: function(model,response){
                 alert("This movie cannot be deleted");
-                NProgress.done();
+                NProgress.done(true);
             }
         });
     },
@@ -299,11 +413,11 @@ var ReviewView = Backbone.View.extend ({
                 moviePage.render(1);
                 renderReviews(reviews);
                 moviePage.render(2);
-                NProgress.done();
+                NProgress.done(true);
             },
             error: function() {
                 alert("error");
-                NProgress.done();
+                NProgress.done(true);
             }
         });
     }
@@ -320,9 +434,9 @@ app_router.on('route:defaultRoute', function(actions) {
 });
 app_router.on('route:viewMovieDetails', function(id) {
     NProgress.start();
-    if (typeof moviePage == 'undefined') {
-        moviePage = new MoviePage({ el: $("#list_container") });
-    }    
+    
+    moviePage = new MoviePage({ el: $("#list_container") });
+        
     movie.set({id:id});
     movie.fetch({
         success: function(movie) {
@@ -338,21 +452,35 @@ app_router.on('route:viewMovieDetails', function(id) {
                 });
             }
         });
-
-
 });
+
+app_router.on('route:editMovieDetails', function(id){
+    var movieEditView = new MovieEditView({ el: $("#list_container") });
+    movieEditView.render(id);
+});
+
 app_router.on('route:createNewMovie', function() {
     NProgress.start();
     var movieCreationView = new MovieCreationView({ el: $("#list_container") });
     movieCreationView.render();
 });
 
+app_router.on('route:movie_in_page', function(id) {
+    NProgress.start();
+    console.log('Going to page: ' + id);
+    page_number = parseInt(id);
+    var movieListView = new MovieListView({ el: $("#list_container") });
+});
+
+
 // Start Backbone history a necessary step for bookmarkable URL's
-Backbone.history.start({pushState: true,
-    root: "/"});
+if (!Backbone.History.started){
+    Backbone.history.start({pushState: true,
+        root: "/"});
+}
 
 function regulate_length(long_string){
-    var max_length = 23;
+    var max_length = 22;
 
     if (long_string.length >= max_length - 3){
         long_string = long_string.substring(0, max_length - 4) + '...';

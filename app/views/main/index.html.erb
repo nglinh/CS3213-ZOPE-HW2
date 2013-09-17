@@ -16,13 +16,55 @@
       <div class='row'>
         <%% _.each(movies, function(movie) { %> 
           <div class="span3 movie">
-            <a id="detail_page" href="movie/<%%= movie.attributes.id %>">
+            <a id="detail_page" href="/movie/<%%= movie.attributes.id %>">
               <h4 class="movie-title"><%%= regulate_length(movie.attributes.title) %></h4>
               <img class= "img-rounded" src=<%%= movie.attributes.img_url %>>
               <p>Score: <%%= regulate_decimal_points(movie.attributes.avg_score) %></p>
             </a>
           </div>
           <%% }); %>
+      </div>
+      <div class='row'>
+        <div class="btn-group page-button-group">
+          <button class="btn previous-page-button">Previous Page</button>
+          <button class="btn next-page-button">Next Page</button>
+        </div>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/template" id="movie_edit">
+    <div class='container'>
+      <div><h3>Edit Movie</h3>
+
+        <form name="new_movie" class="simple-form edit_movie" method="POST">
+          <div class="control-group">
+            <label class="control-label" for="movie-title">Title</label>
+            <div class="controls">
+            <input class="text_field" id="movie_title" name="movie[title]" size="30" type="text" required="true" value="<%%= movie.attributes.title%>">
+            <input class="text_field" id="movie_id" name="movie[id]" size="30" type="hidden" value="<%%= movie.attributes.id%>">
+            </div>
+            </div>
+            <div class="control-group">
+            <label class="control-label" for="movie_summary">Summary</label>
+            <div class="controls">
+            <input class="text_field" id="movie_summary" name="movie[summary]" size="30" type="text" required="true" value="<%%= movie.attributes.summary%>">
+            </div>
+          </div>
+            
+          <img src=<%%= movie.attributes.img_url%>>
+
+          <div class="control-group">
+            <br>
+            <div class="btn movie-img" onclick="add_file_button()">Change Img</div>
+            <br></br>
+            <div class="controls movie-file-holder">
+            </div>
+          </div>
+
+          <input class="btn btn-primary" type="submit"></input>
+          <a href="#" id="cancel" class="btn">Cancel</a>
+        </form>
       </div>
     </div>
   </script>
@@ -52,7 +94,7 @@
             </div>
           </div>
 
-          <input class="btn btn-primary" type="submit">Create Movie</input>
+          <input class="btn btn-primary" type="submit"></input>
           <a href="/" id="cancel" class="btn">Cancel</a>
         </form>
       </div>
@@ -111,7 +153,6 @@
         }
       });
    </script>
-
 </body>
 </html>
 <script type="text/template" id="movie_info_template">

@@ -5,3 +5,7 @@ a:link {color: black;}      /* unvisited link */
 a:visited {color: black;}  /* visited link */
 a:hover {color: black;}  /* mouse over link */
 a:active {color: black;}  /* selected link */
+
+.page-button-group{
+	margin-left: 380px;
+}
