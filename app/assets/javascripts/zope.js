@@ -480,7 +480,7 @@ if (!Backbone.History.started){
 }
 
 function regulate_length(long_string){
-    var max_length = 22;
+    var max_length = 17;
 
     if (long_string.length >= max_length - 3){
         long_string = long_string.substring(0, max_length - 4) + '...';
